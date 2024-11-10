@@ -7,7 +7,8 @@ A MERN stack Employee Management System for managing employees within a company.
 - [Features](#features)
 - [Technologies](#technologies)
 - [Setup and Installation](#setup-and-installation)
-
+- [Login Credentials](#login-credentials)
+- 
 ## Features
 
 - Add, edit, delete, and view employee records
@@ -49,12 +50,12 @@ Make sure you have the following installed:
      cd server
      npm install
      npm run dev
+   
+## Login Credentials
 
-### Login Credentials
+- **Username:** HukumGupta
+- **Password:** 12345678
 
-- **Admin Login:**
-  
-     **username** : HukumGupta
-  
-     **password** : 12345678
+
+
 
