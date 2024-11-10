@@ -36,7 +36,7 @@ Make sure you have the following installed:
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-username/employee-management-system.git
+   git clone https://github.com/prembevinakatti/DealsDray-Test.git
 
 2. Start Client
    ```bash
