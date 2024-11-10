@@ -76,7 +76,7 @@ module.exports.loginAdmin = async (req, res) => {
 
 module.exports.createEmployee = async (req, res) => {
   try {
-    const { name, email, phoneNumber, designation, gender, course, image } =
+    const { name, email, phoneNumber, designation, gender, courses, image } =
       req.body;
 
     if (
@@ -85,7 +85,7 @@ module.exports.createEmployee = async (req, res) => {
       !phoneNumber ||
       !designation ||
       !gender ||
-      !course ||
+      !courses ||
       !image
     ) {
       return res.status(400).json({ message: "All fields are required." });
@@ -99,6 +99,10 @@ module.exports.createEmployee = async (req, res) => {
 
     const userId = generateFourDigitUUID();
 
+    if (!userId) {
+      return res.status(400).json({ message: "Failed to generate userId." });
+    }
+
     const newEmployee = await employeeModel.create({
       userId,
       name,
@@ -106,7 +110,7 @@ module.exports.createEmployee = async (req, res) => {
       phoneNumber,
       designation,
       gender,
-      course,
+      courses,
       image,
     });
 

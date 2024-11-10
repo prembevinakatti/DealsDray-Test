@@ -1,15 +1,28 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button"; // Assuming Button component is already available
 import { useNavigate } from "react-router-dom"; // Assuming you're using react-router-dom for navigation
+import { useDispatch, useSelector } from "react-redux";
+import { setAdmin } from "@/redux/authSlice";
 
-const Navbar = ({ username, onLogout }) => {
+const Navbar = () => {
   const navigate = useNavigate(); // Hook to navigate between pages
   const [activeButton, setActiveButton] = useState("/"); // Default active button is the home button
+  const { authUser } = useSelector((store) => store.admin);
+  const dispatch = useDispatch();
 
   // Function to handle the navigation
   const handleNavigation = (path) => {
     setActiveButton(path); // Set the clicked button as active
     navigate(path); // Navigate to the selected path
+  };
+
+  const onLogout = async () => {
+    try {
+      dispatch(setAdmin(null));
+      navigate("/");
+    } catch (error) {
+      console.log("Error While Logging Out", error);
+    }
   };
 
   return (
@@ -23,51 +36,57 @@ const Navbar = ({ username, onLogout }) => {
           MyLogo
         </div>
 
-        {/* Left Navigation Buttons */}
-        <div className="flex space-x-4">
-          <Button
-            onClick={() => handleNavigation("/home")}
-            className={`${
-              activeButton === "/home"
-                ? "bg-black text-white"
-                : "border-black hover:text-white bg-transparent text-black"
-            } border px-4 py-2 rounded-md`}
-          >
-            Home
-          </Button>
-          <Button
-            onClick={() => handleNavigation("/employeeList")}
-            className={`${
-              activeButton === "/employeeList"
-                ? "bg-black text-white"
-                : "border-black hover:text-white bg-transparent text-black"
-            } border px-4 py-2 rounded-md`}
-          >
-            Employee List
-          </Button>
-          <Button
-            onClick={() => handleNavigation("/createEmployee")}
-            className={`${
-              activeButton === "/createEmployee"
-                ? "bg-black text-white"
-                : "border-black hover:text-white bg-transparent text-black"
-            } border px-4 py-2 rounded-md`}
-          >
-            Create Employee
-          </Button>
-        </div>
+        {authUser && (
+          <>
+            {/* Left Navigation Buttons */}
+            <div className="flex space-x-4">
+              <Button
+                onClick={() => handleNavigation("/home")}
+                className={`${
+                  activeButton === "/home"
+                    ? "bg-black text-white"
+                    : "border-black hover:text-white bg-transparent text-black"
+                } border px-4 py-2 rounded-md`}
+              >
+                Home
+              </Button>
+              <Button
+                onClick={() => handleNavigation("/employeeList")}
+                className={`${
+                  activeButton === "/employeeList"
+                    ? "bg-black text-white"
+                    : "border-black hover:text-white bg-transparent text-black"
+                } border px-4 py-2 rounded-md`}
+              >
+                Employee List
+              </Button>
+              <Button
+                onClick={() => handleNavigation("/createEmployee")}
+                className={`${
+                  activeButton === "/createEmployee"
+                    ? "bg-black text-white"
+                    : "border-black hover:text-white bg-transparent text-black"
+                } border px-4 py-2 rounded-md`}
+              >
+                Create Employee
+              </Button>
+            </div>
 
-        {/* Right Side (Username and Logout button) */}
-        <div className="flex items-center space-x-4">
-          {username && <span className="text-sm">Hello, {username}</span>}
+            {/* Right Side (Username and Logout button) */}
+            <div className="flex items-center space-x-4">
+              {authUser && (
+                <span className="text-sm">Hello, {authUser?.username}</span>
+              )}
 
-          <Button
-            onClick={onLogout}
-            className="bg-red-600 hover:bg-red-700 text-white"
-          >
-            Logout
-          </Button>
-        </div>
+              <Button
+                onClick={onLogout}
+                className="bg-red-600 hover:bg-red-700 text-white"
+              >
+                Logout
+              </Button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

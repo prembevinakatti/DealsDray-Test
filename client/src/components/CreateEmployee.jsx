@@ -1,11 +1,25 @@
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button"; // Button component from ShadCN
-import { Input } from "@/components/ui/input"; // Input component from ShadCN
-import { Card } from "@/components/ui/card"; // Assuming there's a Card component from ShadCN
-import { Label } from "@/components/ui/label"; // Label component from ShadCN
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem, SelectLabel } from "@/components/ui/select"; // Updated Select components for dropdown
-import { Checkbox } from "@/components/ui/checkbox"; // Checkbox component for Course
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"; // Radio component for Gender
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+} from "@/components/ui/select";
+import axios from "axios";
+
+// Loader component (Simple Spinner)
+const Loader = () => (
+  <div className="flex justify-center items-center space-x-2">
+    <div className="w-6 h-6 border-4 border-t-transparent border-blue-500 border-solid rounded-full animate-spin" />
+  </div>
+);
 
 const CreateEmployee = () => {
   const [employeeData, setEmployeeData] = useState({
@@ -17,6 +31,9 @@ const CreateEmployee = () => {
     gender: "",
     image: null,
   });
+
+  const [errorMessage, setErrorMessage] = useState(""); // Added error message state
+  const [loading, setLoading] = useState(false); // Loading state
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -37,157 +54,245 @@ const CreateEmployee = () => {
     });
   };
 
-  const handleRadioChange = (value) => {
-    setEmployeeData((prevData) => ({
-      ...prevData,
-      gender: value,
-    }));
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", "DealsDray-Test");
+      formData.append("cloud_name", "dyp7pxrli");
+
+      setLoading(true); // Set loading to true when uploading
+      try {
+        const response = await axios.post(
+          "https://api.cloudinary.com/v1_1/dyp7pxrli/image/upload",
+          formData
+        );
+
+        setEmployeeData((prevData) => ({
+          ...prevData,
+          image: response.data.secure_url,
+        }));
+      } catch (error) {
+        setErrorMessage("Error uploading image."); // Handle file upload errors
+        console.error("Error uploading image:", error);
+      } finally {
+        setLoading(false); // Set loading to false after upload
+      }
+    }
   };
 
-  const handleFileChange = (e) => {
-    const { files } = e.target;
-    setEmployeeData((prevData) => ({
-      ...prevData,
-      image: files[0],
-    }));
-  };
+  const designationOptions = ["HR", "Manager", "Sales", "Tester"];
+  const courseOptions = ["MCA", "BCA", "BSC"];
+  const genderOptions = ["male", "female"];
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Employee Data:", employeeData);
-    // Add logic to send the data to your API or backend
-  };
 
-  const designationOptions = ["Developer", "Manager", "Designer", "Tester"];
-  const courseOptions = ["React", "Node.js", "Blockchain", "JavaScript"];
-  const genderOptions = ["Male", "Female", "Other"];
+    if (
+      !employeeData.name ||
+      !employeeData.email ||
+      !employeeData.phoneNumber
+    ) {
+      setErrorMessage("Please fill in all the required fields.");
+      return;
+    }
+
+    setLoading(true); // Set loading to true when submitting the form
+    try {
+      const res = await axios.post(
+        `http://localhost:3000/api/v1/dealsdray/admin/createEmployee`,
+        employeeData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+
+      console.log("Successfully created employee ", res.data);
+    } catch (error) {
+      console.log("Error creating employee: ", error);
+      setErrorMessage("Error creating employee.");
+    } finally {
+      setLoading(false); // Set loading to false after submitting
+    }
+  };
 
   return (
     <div className="w-screen h-screen flex items-center justify-center bg-gray-50">
-      <Card className="w-96 p-8 shadow-lg rounded-lg bg-white">
-        <h2 className="text-center text-2xl font-semibold mb-6 text-gray-800">Create Employee</h2>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Name */}
-          <div className="mb-4">
-            <Label htmlFor="name" className="text-sm font-medium text-gray-700">Name</Label>
-            <Input
-              id="name"
-              name="name"
-              type="text"
-              value={employeeData.name}
-              onChange={handleInputChange}
-              required
-              className="w-full mt-2 p-3 border rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
+      <Card className="w-[600px] p-8 shadow-lg rounded-lg bg-white">
+        <h2 className="text-center text-2xl font-semibold mb-6 text-gray-800">
+          Create Employee
+        </h2>
+        <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
+          <div className="col-span-1 space-y-4">
+            {/* Name */}
+            <div>
+              <Label
+                htmlFor="name"
+                className="text-sm font-semibold text-gray-700"
+              >
+                Name
+              </Label>
+              <Input
+                id="name"
+                name="name"
+                type="text"
+                value={employeeData.name}
+                onChange={handleInputChange}
+                required
+                className="w-full mt-2 p-3 border rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
 
-          {/* Email */}
-          <div className="mb-4">
-            <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email</Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              value={employeeData.email}
-              onChange={handleInputChange}
-              required
-              className="w-full mt-2 p-3 border rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
+            {/* Email */}
+            <div>
+              <Label
+                htmlFor="email"
+                className="text-sm font-semibold text-gray-700"
+              >
+                Email
+              </Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                value={employeeData.email}
+                onChange={handleInputChange}
+                required
+                className="w-full mt-2 p-3 border rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
 
-          {/* Phone Number */}
-          <div className="mb-4">
-            <Label htmlFor="phoneNumber" className="text-sm font-medium text-gray-700">Phone Number</Label>
-            <Input
-              id="phoneNumber"
-              name="phoneNumber"
-              type="text"
-              value={employeeData.phoneNumber}
-              onChange={handleInputChange}
-              required
-              className="w-full mt-2 p-3 border rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
+            {/* Phone Number */}
+            <div>
+              <Label
+                htmlFor="phoneNumber"
+                className="text-sm font-semibold text-gray-700"
+              >
+                Phone Number
+              </Label>
+              <Input
+                id="phoneNumber"
+                name="phoneNumber"
+                type="text"
+                value={employeeData.phoneNumber}
+                onChange={handleInputChange}
+                required
+                className="w-full mt-2 p-3 border rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
 
-          {/* Designation */}
-          <div className="mb-4">
-            <Label htmlFor="designation" className="text-sm font-medium text-gray-700">Designation</Label>
-            <Select
-              value={employeeData.designation}
-              onValueChange={(value) => setEmployeeData((prevData) => ({
-                ...prevData,
-                designation: value,
-              }))}
-            >
-              <SelectTrigger className="w-full mt-2 p-3 border rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500">
-                <SelectValue placeholder="Select a designation" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>Designations</SelectLabel>
-                  {designationOptions.map((designation) => (
-                    <SelectItem key={designation} value={designation}>
-                      {designation}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Gender */}
-          <div className="mb-4">
-            <Label className="text-sm font-medium text-gray-700">Gender</Label>
-            <RadioGroup value={employeeData.gender} onValueChange={handleRadioChange}>
-              {genderOptions.map((gender) => (
-                <div key={gender} className="flex items-center space-x-2">
-                  <RadioGroupItem value={gender} id={gender} />
-                  <Label htmlFor={gender}>{gender}</Label>
-                </div>
-              ))}
-            </RadioGroup>
-          </div>
-
-          {/* Courses */}
-          <div className="mb-4">
-            <Label className="text-sm font-medium text-gray-700">Courses</Label>
-            <div className="space-x-4">
-              {courseOptions.map((course) => (
-                <div key={course} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={course}
-                    value={course}
-                    checked={employeeData.courses.includes(course)}
-                    onChange={handleCheckboxChange}
-                  />
-                  <Label htmlFor={course} className="text-sm">{course}</Label>
-                </div>
-              ))}
+            {/* Gender */}
+            <div>
+              <Label className="text-sm font-semibold">Gender</Label>
+              <div className="flex items-center gap-3 mt-2">
+                {genderOptions.map((gender) => (
+                  <div key={gender} className="flex items-center gap-1">
+                    <input
+                      type="radio"
+                      className="cursor-pointer"
+                      name="gender"
+                      value={gender}
+                      checked={employeeData.gender === gender}
+                      onChange={(e) =>
+                        setEmployeeData((prevData) => ({
+                          ...prevData,
+                          gender: e.target.value,
+                        }))
+                      }
+                    />
+                    <label>{gender}</label>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Image */}
-          <div className="mb-4">
-            <Label htmlFor="image" className="text-sm font-medium text-gray-700">Image</Label>
-            <Input
-              id="image"
-              name="image"
-              type="file"
-              onChange={handleFileChange}
-              className="w-full mt-2 p-3 border rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500"
-            />
+          <div className="col-span-1 space-y-4">
+            {/* Designation */}
+            <div>
+              <Label
+                htmlFor="designation"
+                className="text-sm font-semibold text-gray-700"
+              >
+                Designation
+              </Label>
+              <Select
+                value={employeeData.designation}
+                onValueChange={(value) =>
+                  setEmployeeData((prevData) => ({
+                    ...prevData,
+                    designation: value,
+                  }))
+                }
+              >
+                <SelectTrigger className="w-full mt-2 p-3 border rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500">
+                  <SelectValue placeholder="Select a designation" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Designations</SelectLabel>
+                    {designationOptions.map((designation) => (
+                      <SelectItem key={designation} value={designation}>
+                        {designation}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Courses */}
+            <div>
+              <Label className="text-sm font-semibold">Courses</Label>
+              <div className="flex items-center gap-3 mt-2">
+                {courseOptions.map((course) => (
+                  <div key={course} className="flex items-center gap-1">
+                    <input
+                      type="checkbox"
+                      className="cursor-pointer"
+                      value={course}
+                      checked={employeeData.courses.includes(course)}
+                      onChange={handleCheckboxChange}
+                    />
+                    <label>{course}</label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Image */}
+            <div>
+              <Label className="text-sm font-semibold">Image</Label>
+              <input
+                type="file"
+                name="image"
+                className="w-full p-2 mt-2 border border-gray-300 rounded"
+                onChange={handleFileChange}
+              />
+            </div>
           </div>
 
           {/* Submit Button */}
-          <div className="mt-6 text-center">
+          <div className="col-span-2 mt-4">
             <Button
               type="submit"
               className="w-full p-3 bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              Create Employee
+              {loading ? <Loader /> : "Create Employee"}
             </Button>
           </div>
         </form>
+
+        {/* Error Message Display */}
+        {errorMessage && (
+          <div className="text-red-500 text-sm mt-2 text-center">
+            {errorMessage}
+          </div>
+        )}
       </Card>
     </div>
   );

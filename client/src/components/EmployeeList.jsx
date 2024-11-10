@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dialog"; // ShadCN Dialog components
 import { Button } from "@/components/ui/button"; // Button component
 import useGetAllEmployeesList from "@/hooks/useGetAllEmployeesList"; // Hook to get employees list
+import axios from "axios";
 
 const EmployeeList = () => {
   const employees = useGetAllEmployeesList();
@@ -30,7 +31,7 @@ const EmployeeList = () => {
   // Course options (checkboxes)
   const courseOptions = ["MCA", "BCA", "BSC"];
   // Gender options (radio buttons)
-  const genderOptions = ["Male", "Female"];
+  const genderOptions = ["male", "female"];
 
   // Filtered employees based on search query
   const filteredEmployees = employees.filter(
@@ -41,18 +42,48 @@ const EmployeeList = () => {
 
   const handleEditClick = (employee) => {
     setSelectedEmployee(employee);
-    setUpdatedEmployee(employee); // Initialize updatedEmployee state with selected data
+    setUpdatedEmployee({
+      ...employee,
+      courses: employee.courses || [], // Ensure it's an array, even if empty
+    });
     setIsDialogOpen(true);
   };
 
-  const handleDeleteClick = (employeeId) => {
-    // Handle delete logic here (e.g., API call)
-    console.log(`Deleting employee with ID: ${employeeId}`);
+  const handleDeleteClick = async (employeeId) => {
+    try {
+      const res = await axios.delete(
+        `http://localhost:3000/api/v1/dealsdray/admin/deleteEmployee/${employeeId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      console.log("Successfully deleted employee", res.data);
+      window.location.reload();
+    } catch (error) {
+      console.log("Error deleting employee :", error);
+    }
   };
 
-  const handleSave = () => {
-    // Log the updated employee data (you can replace this with actual save logic, e.g., API call)
-    console.log("Updated Employee Data:", updatedEmployee);
+  const handleSave = async () => {
+    try {
+      const res = await axios.put(
+        `http://localhost:3000/api/v1/dealsdray/admin/updateEmployee`,
+        updatedEmployee,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      console.log("updateEmployee success :", res.data);
+    } catch (error) {
+      console.log("updateEmployee error :", error);
+    }
+
     setIsDialogOpen(false); // Close the dialog after saving
   };
 
@@ -68,10 +99,10 @@ const EmployeeList = () => {
     const { name, value, checked } = e.target;
     setUpdatedEmployee((prevData) => {
       const updatedCourses = checked
-        ? [...prevData[name], value]
-        : prevData[name].filter((course) => course !== value);
+        ? [...prevData.courses, value] // Use spread operator to add the course
+        : prevData.courses.filter((course) => course !== value); // Remove course if unchecked
 
-      return { ...prevData, [name]: updatedCourses };
+      return { ...prevData, courses: updatedCourses };
     });
   };
 
@@ -128,7 +159,7 @@ const EmployeeList = () => {
               <TableCell>{employee.phoneNumber}</TableCell>
               <TableCell>{employee.designation}</TableCell>
               <TableCell>{employee.gender}</TableCell>
-              <TableCell>{employee.course}</TableCell>
+              <TableCell>{employee.courses.join(",")}</TableCell>
               <TableCell>
                 {new Date(employee.createdAt).toLocaleDateString()}
               </TableCell>
@@ -142,7 +173,7 @@ const EmployeeList = () => {
                   </Button>
                   <Button
                     className="bg-red-600 text-white"
-                    onClick={() => handleDeleteClick(employee.userId)}
+                    onClick={() => handleDeleteClick(employee._id)}
                   >
                     Delete
                   </Button>
@@ -235,11 +266,12 @@ const EmployeeList = () => {
                   <div className="flex items-center gap-3">
                     {courseOptions.map((course) => (
                       <div key={course}>
-                        <input className="cursor-pointer"
+                        <input
+                          className="cursor-pointer"
                           type="checkbox"
                           name="course"
                           value={course}
-                          checked={updatedEmployee.course.includes(course)}
+                          checked={updatedEmployee.courses.includes(course)}
                           onChange={handleCheckboxChange}
                         />
                         <label> {course}</label>

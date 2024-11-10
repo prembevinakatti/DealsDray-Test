@@ -33,11 +33,13 @@ const employeeSchema = new mongoose.Schema(
       enum: ["male", "female"],
       required: true,
     },
-    course: {
-      type: String,
-      required: true,
-      enum: ["MCA", "BCA", "BSC"],
-    },
+    courses: [
+      {
+        type: String,
+        required: true,
+        enum: ["MCA", "BCA", "BSC"],
+      },
+    ],
     image: {
       type: String,
       default: "default.jpg",

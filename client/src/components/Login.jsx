@@ -12,15 +12,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setAdmin } from "@/redux/authSlice";
 
 const Login = () => {
   const [data, setData] = useState({
     username: "",
     password: "",
   });
-  const [loading, setLoading] = useState(false);  
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState("");
+  const dispatch = useDispatch();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,7 +33,7 @@ const Login = () => {
       return;
     }
 
-    setLoading(true); 
+    setLoading(true);
 
     try {
       const response = await axios.post(
@@ -44,12 +47,16 @@ const Login = () => {
         }
       );
       if (response.data.success) {
-        navigate("/dashboard");
+        dispatch(setAdmin(response.data.admin));
+        console.log(response.data);
+
+        navigate("/home");
       } else {
         setErrorMessage("Invalid username or password.");
       }
     } catch (error) {
       setErrorMessage("An error occurred. Please try again.");
+      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -107,7 +114,7 @@ const Login = () => {
               type="submit"
               className="px-10"
               onClick={handleSubmit}
-              disabled={loading}  
+              disabled={loading}
             >
               {loading ? (
                 <div className="flex justify-center items-center">
