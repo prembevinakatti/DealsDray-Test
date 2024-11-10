@@ -1,4 +1,4 @@
-# Employee Management System
+# DealsDray-Machine-Test
 
 A MERN stack Employee Management System for managing employees within a company. This project includes user authentication, employee information management, and CRUD operations for handling employee data.
 
@@ -7,11 +7,6 @@ A MERN stack Employee Management System for managing employees within a company.
 - [Features](#features)
 - [Technologies](#technologies)
 - [Setup and Installation](#setup-and-installation)
-- [Environment Variables](#environment-variables)
-- [Usage](#usage)
-- [Scripts](#scripts)
-- [Folder Structure](#folder-structure)
-- [License](#license)
 
 ## Features
 
