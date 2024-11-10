@@ -74,6 +74,24 @@ module.exports.loginAdmin = async (req, res) => {
   }
 };
 
+module.exports.logoutAdmin = async (req, res) => {
+  try {
+    const admin = req.user;
+
+    if (!admin) {
+      return res.status(401).json({ message: "Unauthorized access." });
+    }
+
+    res.clearCookie("token");
+
+    return res
+      .status(200)
+      .json({ message: "Admin logged out successfully.", success: true });
+  } catch (error) {
+    console.log("Error logging out : " + error.message);
+  }
+};
+
 module.exports.createEmployee = async (req, res) => {
   try {
     const { name, email, phoneNumber, designation, gender, courses, image } =
@@ -184,7 +202,6 @@ module.exports.updateEmployee = async (req, res) => {
     if (course) updateFields.course = course;
     if (image) updateFields.image = image;
     if (typeof active === "boolean") updateFields.active = active;
-
 
     const updatedEmployee = await employeeModel.findOneAndUpdate(
       { userId },

@@ -276,6 +276,7 @@ const CreateEmployee = () => {
               <input
                 type="file"
                 name="image"
+                accept=".jpg, .jpeg, .png"
                 className="w-full p-2 mt-2 border border-gray-300 rounded"
                 onChange={handleFileChange}
               />

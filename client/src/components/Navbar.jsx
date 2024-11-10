@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button"; // Assuming Button component is
 import { useNavigate } from "react-router-dom"; // Assuming you're using react-router-dom for navigation
 import { useDispatch, useSelector } from "react-redux";
 import { setAdmin } from "@/redux/authSlice";
+import toast from "react-hot-toast";
+import axios from "axios";
 
 const Navbar = () => {
   const navigate = useNavigate(); // Hook to navigate between pages
@@ -18,8 +20,21 @@ const Navbar = () => {
 
   const onLogout = async () => {
     try {
-      dispatch(setAdmin(null));
-      navigate("/");
+      const res = await axios.get(
+        `http://localhost:3000/api/v1/dealsdray/admin/logoutAdmin`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+
+      if (res.data.success) {
+        dispatch(setAdmin(null));
+        navigate("/");
+        toast.success(res.data.message);
+      }
     } catch (error) {
       console.log("Error While Logging Out", error);
     }
