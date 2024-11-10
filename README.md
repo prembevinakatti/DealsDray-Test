@@ -8,7 +8,8 @@ A MERN stack Employee Management System for managing employees within a company.
 - [Technologies](#technologies)
 - [Setup and Installation](#setup-and-installation)
 - [Login Credentials](#login-credentials)
-- 
+
+
 ## Features
 
 - Add, edit, delete, and view employee records
