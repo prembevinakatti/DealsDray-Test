@@ -6,10 +6,12 @@ import Home from "./components/Home";
 import EmployeeList from "./components/EmployeeList";
 import CreateEmployee from "./components/CreateEmployee";
 import { Outlet } from "react-router-dom";
+import { useSelector } from "react-redux";
+
 function Layout({ username, onLogout }) {
   return (
     <div>
-      <Navbar username={username} onLogout={onLogout} />
+      <Navbar />
       <main>
         <Outlet />
       </main>
@@ -18,7 +20,7 @@ function Layout({ username, onLogout }) {
 }
 
 function App() {
-  const [username, setUsername] = useState("John Doe");
+  const { authUser } = useSelector((store) => store.admin);
 
   const handleLogout = () => {
     console.log("Logged out!");
@@ -27,7 +29,7 @@ function App() {
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <Layout username={username} onLogout={handleLogout} />,
+      element: <Layout />,
       children: [
         {
           path: "/",
@@ -35,15 +37,15 @@ function App() {
         },
         {
           path: "/home",
-          element: <Home />,
+          element: authUser ? <Home /> : <Login />,
         },
         {
           path: "/employeeList",
-          element: <EmployeeList />,
+          element: authUser ? <EmployeeList /> : <Login />,
         },
         {
           path: "/createEmployee",
-          element: <CreateEmployee />,
+          element: authUser ? <CreateEmployee /> : <Login />,
         },
       ],
     },
