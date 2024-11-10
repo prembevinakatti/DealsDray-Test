@@ -49,3 +49,9 @@ Make sure you have the following installed:
      cd server
      npm install
      npm run dev
+
+### Login Credentials
+- **Admin Login:**
+     **username** : HukumGupta
+     **password** : 12345678
+
