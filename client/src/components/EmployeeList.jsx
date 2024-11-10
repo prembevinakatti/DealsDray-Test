@@ -80,6 +80,7 @@ const EmployeeList = () => {
         }
       );
       console.log("updateEmployee success :", res.data);
+      console.log(updatedEmployee);
     } catch (error) {
       console.log("updateEmployee error :", error);
     }
@@ -286,6 +287,44 @@ const EmployeeList = () => {
                     name="image"
                     className="w-full p-2 border border-gray-300 rounded"
                   />
+                </div>
+
+                <div className="mb-2">
+                  <label className="block font-semibold">Active</label>
+                  <div className="flex items-center gap-3">
+                    <div>
+                      <input
+                        type="radio"
+                        name="active"
+                        value="true"
+                        className="cursor-pointer"
+                        checked={updatedEmployee.active === true}
+                        onChange={() =>
+                          setUpdatedEmployee((prevData) => ({
+                            ...prevData,
+                            active: true,
+                          }))
+                        }
+                      />
+                      <label> Yes</label>
+                    </div>
+                    <div>
+                      <input
+                        type="radio"
+                        name="active"
+                        value="false"
+                        className="cursor-pointer"
+                        checked={updatedEmployee.active === false}
+                        onChange={() =>
+                          setUpdatedEmployee((prevData) => ({
+                            ...prevData,
+                            active: false,
+                          }))
+                        }
+                      />
+                      <label> No</label>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}

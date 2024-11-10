@@ -152,6 +152,7 @@ module.exports.updateEmployee = async (req, res) => {
   try {
     const {
       userId,
+      active,
       name,
       email,
       phoneNumber,
@@ -182,6 +183,8 @@ module.exports.updateEmployee = async (req, res) => {
     if (gender) updateFields.gender = gender;
     if (course) updateFields.course = course;
     if (image) updateFields.image = image;
+    if (typeof active === "boolean") updateFields.active = active;
+
 
     const updatedEmployee = await employeeModel.findOneAndUpdate(
       { userId },

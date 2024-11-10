@@ -45,6 +45,10 @@ const employeeSchema = new mongoose.Schema(
       default: "default.jpg",
       required: true,
     },
+    active: {
+      type: Boolean,
+      default: true,
+    },
   },
   { timestamps: true }
 );
