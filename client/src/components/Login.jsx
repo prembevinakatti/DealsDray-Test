@@ -14,6 +14,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setAdmin } from "@/redux/authSlice";
+import toast from "react-hot-toast";
 
 const Login = () => {
   const [data, setData] = useState({
@@ -51,6 +52,7 @@ const Login = () => {
         console.log(response.data);
 
         navigate("/home");
+        toast.success(response.data.message);
       } else {
         setErrorMessage("Invalid username or password.");
       }

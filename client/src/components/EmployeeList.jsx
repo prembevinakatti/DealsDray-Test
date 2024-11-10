@@ -18,6 +18,8 @@ import {
 import { Button } from "@/components/ui/button"; // Button component
 import useGetAllEmployeesList from "@/hooks/useGetAllEmployeesList"; // Hook to get employees list
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const EmployeeList = () => {
   const employees = useGetAllEmployeesList();
@@ -25,6 +27,7 @@ const EmployeeList = () => {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [updatedEmployee, setUpdatedEmployee] = useState(null);
+  const navigate = useNavigate();
 
   // Designation options (dropdown)
   const designationOptions = ["HR", "Manager", "Sales"];
@@ -61,6 +64,7 @@ const EmployeeList = () => {
         }
       );
       console.log("Successfully deleted employee", res.data);
+      toast.success(res.data.message);
       window.location.reload();
     } catch (error) {
       console.log("Error deleting employee :", error);
@@ -79,13 +83,14 @@ const EmployeeList = () => {
           withCredentials: true,
         }
       );
-      console.log("updateEmployee success :", res.data);
-      console.log(updatedEmployee);
+      if (res.data.success) {
+        toast.success(res.data.message);
+      }
     } catch (error) {
       console.log("updateEmployee error :", error);
     }
 
-    setIsDialogOpen(false); // Close the dialog after saving
+    setIsDialogOpen(false);
   };
 
   const handleInputChange = (e) => {

@@ -13,6 +13,8 @@ import {
   SelectLabel,
 } from "@/components/ui/select";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 // Loader component (Simple Spinner)
 const Loader = () => (
@@ -31,6 +33,7 @@ const CreateEmployee = () => {
     gender: "",
     image: null,
   });
+  const navigate = useNavigate();
 
   const [errorMessage, setErrorMessage] = useState(""); // Added error message state
   const [loading, setLoading] = useState(false); // Loading state
@@ -82,7 +85,7 @@ const CreateEmployee = () => {
     }
   };
 
-  const designationOptions = ["HR", "Manager", "Sales", "Tester"];
+  const designationOptions = ["HR", "Manager", "Sales"];
   const courseOptions = ["MCA", "BCA", "BSC"];
   const genderOptions = ["male", "female"];
 
@@ -111,7 +114,10 @@ const CreateEmployee = () => {
         }
       );
 
-      console.log("Successfully created employee ", res.data);
+      if (res.data.success) {
+        navigate("/employeeList");
+        toast.success(res.data.message);
+      }
     } catch (error) {
       console.log("Error creating employee: ", error);
       setErrorMessage("Error creating employee.");
